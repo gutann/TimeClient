@@ -13,19 +13,16 @@ void TimeClient::write_handler(boost::shared_ptr<std::string> pstr, error_code e
 }
 
 void TimeClient::read_handler(const boost::system::error_code& error)
-    {	
-	ofstream myfile;
-	myfile.open("example.txt");
-	myfile.close();
-            if(!error)
-            {
-                    std::cout << "Message: " << buf.data() << std::endl << std::flush;
-            }
-            else
-            {
-                    std::cout << "Error occurred." << std::endl << std::flush;
-            }
+{	
+    if(!error)
+    {
+    	std::cout << "Message: " << buf.data() << std::endl << std::flush;
     }
+    else
+    {
+    	std::cout << "Error occurred." << std::endl << std::flush;
+    }
+}
 
 
 void TimeClient::start(char* server_ip)
@@ -37,30 +34,37 @@ void TimeClient::start(char* server_ip)
 	boost::asio::connect(socket, endpoint_iterator);
 
     	// The connection is open. All we need to do now is read the response from the daytime service.
-    	int nFail = 0;
-    	for (;;)
-    	{
-      		// We use a boost::array to hold the received data.
-      		//boost::array<char, 128> buf;
-      		boost::system::error_code error;
+	int nFail = 0;
+	boost::array<char, 128> local_buf2;
+/*	socket.async_read_some(boost::asio::buffer(local_buf2, 128), boost::bind(&TimeClient::read_handler, this, boost::asio::placeholders::error));
+	boost::asio::connect(socket, endpoint_iterator);
+	io_service.run();
+*/
+	for (;;)
+	{
+  		// We use a boost::array to hold the received data.
+  		boost::array<char, 128> local_buf;
+  		boost::system::error_code error;
 
-      		// The boost::asio::buffer() function automatically determines
-      		// the size of the array to help prevent buffer overruns.
-      		boost::shared_ptr<std::string> pstr(new std::string("time from client"));
-      		socket.send(boost::asio::buffer(*pstr));
-      		cout << "msg send" << endl << std::flush;
-      		sleep(2);
-
-#if 0
-	//	socket.async_read_some(boost::asio::buffer(buf), boost::bind(&TimeClient::read_handler, this, boost::asio::placeholders::error));
-		boost::asio::async_read(socket, 
+  		// The boost::asio::buffer() function automatically determines
+  		// the size of the array to help prevent buffer overruns.
+  		boost::shared_ptr<std::string> pstr(new std::string("time from client"));
+  		socket.send(boost::asio::buffer(*pstr));
+  		cout << "msg send" << endl << std::flush;
+  		sleep(2);
+		//io_service.run_one();
+#if 1
+		socket.async_read_some(boost::asio::buffer(buf, 8), boost::bind(&TimeClient::read_handler, this, boost::asio::placeholders::error));
+		io_service.run_one();
+		io_service.reset();
+	/*	boost::asio::async_read(socket, 
 		boost::asio::buffer(buf),
 		boost::asio::transfer_at_least(1),
 		boost::bind(&TimeClient::read_handler, this, boost::asio::placeholders::error));
-		//std::cout << std::endl;
+	*/	//std::cout << std::endl;
 #endif
 
-#if 1
+#if 0
 		size_t len = socket.read_some(boost::asio::buffer(buf), error);
       // When the server closes the connection,
       // the ip::tcp::socket::read_some() function will exit with the boost::asio::error::eof error,
