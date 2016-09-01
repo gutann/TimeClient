@@ -11,9 +11,9 @@ CFLAGS=$(IDIR) $(LDIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 TimeClient: timeclient.o
-	$(CC)  -o TimeClient timeclient.o $(CFLAGS) $(LIBS)
+	$(CC)  -o TimeClient main.cpp  timeclient.o $(CFLAGS) $(LIBS)
 
-timeclient.o : timeclient.cpp
+timeclient.o : timeclient.cpp timeclient.h
 	$(CC) -c timeclient.cpp $(CFLAGS) $(LIBS)
 
 #TimeClient:

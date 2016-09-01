@@ -1,46 +1,35 @@
-#include <iostream>
-#include <fstream>
-#include <boost/array.hpp>
-#include <boost/asio.hpp>
-#include <boost/smart_ptr.hpp>
-#include <boost/bind.hpp>
+#include "timeclient.h"
 
 using boost::asio::ip::tcp;
 using namespace std;
 
-class TimeClient {
-public:
-	boost::array<char, 8> buf;
-
-	TimeClient() {};
-	~TimeClient() {};
-	void write_handler(boost::shared_ptr<std::string> pstr, error_code ec,
+void TimeClient::write_handler(boost::shared_ptr<std::string> pstr, error_code ec,
                 size_t bytes_transferred)
-        {
-                if(ec)
-                std::cout<< "發送失敗!" << std::endl;
-                else
-                std::cout<< *pstr << " 已發送2 " << std::endl;
-        }
+{
+	if(ec)
+	std::cout<< "發送失敗!" << std::endl;
+	else
+	std::cout<< *pstr << " 已發送2 " << std::endl;
+}
 
-	void read_handler(const boost::system::error_code& error)
-        {	
-		ofstream myfile;
-  		myfile.open("example.txt");
-		myfile.close();
-                if(!error)
-                {
-                        std::cout << "Message: " << buf.data() << std::endl << std::flush;
-                }
-                else
-                {
-                        std::cout << "Error occurred." << std::endl << std::flush;
-                }
-        }
+void TimeClient::read_handler(const boost::system::error_code& error)
+    {	
+	ofstream myfile;
+	myfile.open("example.txt");
+	myfile.close();
+            if(!error)
+            {
+                    std::cout << "Message: " << buf.data() << std::endl << std::flush;
+            }
+            else
+            {
+                    std::cout << "Error occurred." << std::endl << std::flush;
+            }
+    }
 
 
-    void start(boost::asio::io_service &io_service, char* server_ip)
-    {
+void TimeClient::start(char* server_ip)
+{
 	tcp::resolver resolver(io_service);
 	tcp::resolver::query query(server_ip, "1000");
 	tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
@@ -101,9 +90,8 @@ public:
       sleep(1);
 #endif
 	}
-    }
-};
-
+}
+/*
 int main(int argc, char* argv[])
 {
   try
@@ -203,3 +191,4 @@ int main(int argc, char* argv[])
 
   return 0;
 }
+*/

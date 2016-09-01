@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     tcp::resolver resolver(io_service);
 
     TimeClient client;
-    client.start(io_service, argv[1]);
+    client.start(argv[1]);
     return 0;
   }
   // handle any exceptions that may have been thrown.
